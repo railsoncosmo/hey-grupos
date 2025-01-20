@@ -8,8 +8,50 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+
 export default function ModalNewRoom({ setVisible }) {
   const [roomName, setRoomName] = useState("");
+
+  const user = auth().currentUser.toJSON();
+
+  //Funções que confere se o usuário está criando a sala com um nome vazio
+  function handleButtonRoom() {
+    if (roomName === '')
+      return;
+
+    //Se estiver preenchido o formulário, chama a função que cria a sala.
+    createRoom();
+  }
+
+  //Criação da sala
+  function createRoom() {
+
+    firestore()
+    .collection('MESSAGES_THREADS')
+    .add({
+      name: roomName,
+      owner: user.uid,
+      lastMessage: {
+        text: `Grupo ${roomName} criado. Bem vindo(a)!`,
+        createdAt: firestore.FieldValue.serverTimestamp(), //Cria um Timestamp no firebase
+      }
+    })
+    .then((docRef) =>{
+      docRef.collection('MESSAGES').add({
+        text: `Grupo ${roomName} criado. Bem vindo(a)!`,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        system: true
+      })
+      .then(() => {
+        setVisible();
+      })
+    })
+    .catch((error) => {
+      alert(`Ocorreu um erro ao criar o grupo: ${error}`);
+    })
+  }
 
   return (
     <View style={styles.container}>
@@ -25,8 +67,12 @@ export default function ModalNewRoom({ setVisible }) {
           onChangeText={(text) => setRoomName(text)}
         />
 
-        <TouchableOpacity style={styles.buttonCreate}>
+        <TouchableOpacity style={styles.buttonCreate} onPress={createRoom}>
           <Text style={styles.buttonCreateText}>Criar Sala</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buttonBackModal} onPress={setVisible}>
+          <Text>Voltar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -71,5 +117,10 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 19,
     fontWeight: "bold",
+  },
+  buttonBackModal: {
+    marginTop: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 });
