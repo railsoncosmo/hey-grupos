@@ -11,18 +11,33 @@ import {
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
-export default function ModalNewRoom({ setVisible }) {
+export default function ModalNewRoom({ setVisible, setUpdateScreen }) {
   const [roomName, setRoomName] = useState("");
 
   const user = auth().currentUser.toJSON();
 
   //Funções que confere se o usuário está criando a sala com um nome vazio
   function handleButtonRoom() {
-    if (roomName === '')
-      return;
+    if (roomName === '') return;
 
-    //Se estiver preenchido o formulário, chama a função que cria a sala.
-    createRoom();
+    firestore()
+    .collection('MESSAGES_THREADS')
+    .get()
+    .then((snapshot) => {
+      let myThreads = 0;
+
+      snapshot.docs.forEach(docItem => {
+        if(docItem.data().owner === user.uid){ //A cada sala criada conforme o id do usuário acrescenta 1 na variável myThreads
+          myThreads += 1;
+        }
+      })
+      if(myThreads >= 4){ //Limitando o usuário a criar 4 salas
+        alert('Limite de salas atingido!');
+      }else { //Se o usuário criar menos de 4 salas.
+        //Se estiver preenchido o formulário, chama a função que cria a sala.
+        createRoom();
+      }
+    })
   }
 
   //Criação da sala
@@ -46,6 +61,7 @@ export default function ModalNewRoom({ setVisible }) {
       })
       .then(() => {
         setVisible();
+        setUpdateScreen();
       })
     })
     .catch((error) => {
@@ -67,7 +83,7 @@ export default function ModalNewRoom({ setVisible }) {
           onChangeText={(text) => setRoomName(text)}
         />
 
-        <TouchableOpacity style={styles.buttonCreate} onPress={createRoom}>
+        <TouchableOpacity style={styles.buttonCreate} onPress={handleButtonRoom}>
           <Text style={styles.buttonCreateText}>Criar Sala</Text>
         </TouchableOpacity>
 
