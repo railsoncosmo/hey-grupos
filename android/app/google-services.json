@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "713178500086",
+    "project_id": "heychat-d8949",
+    "storage_bucket": "heychat-d8949.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:713178500086:android:ddc2d8d531bb80f560d5d7",
+        "android_client_info": {
+          "package_name": "com.heygrupos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlPefBCYpLOxvaY5R5CKcO1UFUTkWF8Dc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
