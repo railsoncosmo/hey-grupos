@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignIn from '../pages/SignIn';
 import ChatRoom from '../pages/ChatRoom';
 import Messages from '../pages/Messages';
+import Search from '../pages/Search';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,14 @@ export default function AppRoutes() {
             options={({ route }) => ({ //Recebe o parametro da rota
                 title: route.params.threads.name //Usando o parametro da rota para a mudança de nome do titulo
             })}
+        />
+
+        <Stack.Screen
+            name="Search"
+            component={Search}
+            options={{
+                title: "Procurando algum grupo?"
+            }}
         />
         </Stack.Navigator>
     )

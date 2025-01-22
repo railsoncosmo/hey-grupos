@@ -63,6 +63,40 @@ export default function Messages({ route }) {
 
   }, []);
 
+  async function handleSend() {
+
+    if(input === '') return;
+
+    await firestore()
+    .collection('MESSAGES_THREADS')
+    .doc(threads._id)
+    .collection('MESSAGES')
+    .add({
+      text: input,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      user: {
+        _id: user.uid,
+        displayName: user.displayName
+      }
+    })
+    
+    await firestore()
+    .collection('MESSAGES_THREADS')
+    .doc(threads._id)
+    .set(
+      { //Valores que serão atualizados
+      lastMessage: {
+        text: input,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      }
+    },
+    { merge: true } //Habilita a atualização parcial do documento, sem sobreescrever o documento completo.
+  )
+  .then(() => {
+    setInput('');
+  })
+}
+
  return (
    <SafeAreaView style={styles.container}>
     <FlatList
@@ -70,6 +104,7 @@ export default function Messages({ route }) {
       data={messages}
       keyExtractor={ item => item._id}
       renderItem={ ({item}) => <ChatMessage data={item} />}
+      inverted={true}
     />
 
     <KeyboardAvoidingView
@@ -89,7 +124,7 @@ export default function Messages({ route }) {
             autoCorrect={false} //Desativa a correção automática do teclado do dispositivo
           />
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSend} >
           <View style={styles.buttonContainer}>
           <Feather name="send" size={22} color="#fff" />
           </View>
